@@ -1,21 +1,28 @@
-export default function handler(req, res) {
-  if (req.method === "POST") {
-    const { cycle, subject, level, docType, lang, topic } = req.body;
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-    // محتوى تجريبي لإظهار النتيجة
-    const content = `
+  const { cycle, subject, level, docType, lang, topic } = req.body;
+
+  if (!cycle || !subject || !level || !docType || !lang) {
+    return res.status(400).json({ error: "يرجى ملء جميع الحقول المطلوبة" });
+  }
+
+  try {
+    // هنا يمكنك استدعاء OpenAI API أو أي منطق لإنشاء المذكرة/الاختبار
+    // مثال: محتوى افتراضي للتجربة
+    const content = `مذكرة/اختبار:
 الطور: ${cycle}
 المادة: ${subject}
-المستوى/السنة: ${level}
+المستوى: ${level}
 نوع المستند: ${docType}
 اللغة: ${lang}
-الموضوع: ${topic || "لا يوجد موضوع محدد"}
-
-🔹 هذه نتيجة تجريبية لإنشاء المستند.
-    `;
+الموضوع: ${topic || "عام"}`;
 
     res.status(200).json({ content });
-  } else {
-    res.status(405).json({ error: "Only POST requests allowed" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "حدث خطأ أثناء إنشاء المستند" });
   }
 }
