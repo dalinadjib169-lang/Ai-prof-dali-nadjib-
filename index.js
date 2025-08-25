@@ -25,7 +25,7 @@ export default function Home() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cycle, subject, level, docType, lang, topic }),
+        body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
       });
 
       const data = await res.json();
@@ -42,8 +42,15 @@ export default function Home() {
   const handleDownloadPDF = () => {
     if (!result) return;
     const doc = new jsPDF();
-    doc.text(result, 10, 10);
+    const splitText = doc.splitTextToSize(result, 180);
+    doc.text(splitText, 10, 10);
     doc.save(`${subject || "document"}.pdf`);
+  };
+
+  const handleDownloadTXT = () => {
+    if (!result) return;
+    const blob = new Blob([result], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, `${subject || "document"}.txt`);
   };
 
   return (
@@ -94,20 +101,14 @@ export default function Home() {
       </button>
 
       {result && (
-        <div style={{ marginTop: 20 }}>
-          <div
-            style={{
-              whiteSpace: "pre-wrap",
-              border: "1px solid #ccc",
-              padding: 10,
-              background: "#f9f9f9",
-            }}
-          >
-            {result}
+        <div style={{ marginTop: 20, whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: 10 }}>
+          {result}
+          <div style={{ marginTop: 10 }}>
+            <button onClick={handleDownloadPDF} style={{ marginRight: 10 }}>
+              تحميل PDF
+            </button>
+            <button onClick={handleDownloadTXT}>تحميل TXT</button>
           </div>
-          <button onClick={handleDownloadPDF} style={{ marginTop: 10 }}>
-            تحميل PDF
-          </button>
         </div>
       )}
     </div>
