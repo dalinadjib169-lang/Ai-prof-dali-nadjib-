@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
 
 export default function Home() {
   const [cycle, setCycle] = useState("");
@@ -27,7 +25,6 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
       });
-
       const data = await res.json();
       if (res.ok) setResult(data.content);
       else alert(data.error || "حدث خطأ");
@@ -39,22 +36,8 @@ export default function Home() {
     setLoading(false);
   };
 
-  const handleDownloadPDF = () => {
-    if (!result) return;
-    const doc = new jsPDF();
-    const splitText = doc.splitTextToSize(result, 180);
-    doc.text(splitText, 10, 10);
-    doc.save(`${subject || "document"}.pdf`);
-  };
-
-  const handleDownloadTXT = () => {
-    if (!result) return;
-    const blob = new Blob([result], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, `${subject || "document"}.txt`);
-  };
-
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, fontFamily: "Arial, sans-serif" }}>
       <h1>مولد المذكرات والاختبارات</h1>
 
       <div>
@@ -103,12 +86,6 @@ export default function Home() {
       {result && (
         <div style={{ marginTop: 20, whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: 10 }}>
           {result}
-          <div style={{ marginTop: 10 }}>
-            <button onClick={handleDownloadPDF} style={{ marginRight: 10 }}>
-              تحميل PDF
-            </button>
-            <button onClick={handleDownloadTXT}>تحميل TXT</button>
-          </div>
         </div>
       )}
     </div>
