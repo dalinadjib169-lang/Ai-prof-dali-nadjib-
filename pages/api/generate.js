@@ -11,9 +11,7 @@ export default async function handler(req, res) {
 
   const model = process.env.HF_MODEL || "tiiuae/falcon-7b-instruct";
   const apiKey = process.env.HUGGINGFACE_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: "Missing HUGGINGFACE_API_KEY" });
-  }
+  if (!apiKey) return res.status(500).json({ error: "Missing HUGGINGFACE_API_KEY" });
 
   const labels = {
     ar: { memo: "مذكرة درس", assessment: "فرض", exam: "اختبار" },
@@ -21,8 +19,7 @@ export default async function handler(req, res) {
     en: { memo: "lesson plan", assessment: "quiz", exam: "exam" }
   };
 
-  const typeLabel =
-    (lang === "ar" ? labels.ar : lang === "fr" ? labels.fr : labels.en)[docType];
+  const typeLabel = (lang === "ar" ? labels.ar : lang === "fr" ? labels.fr : labels.en)[docType];
 
   const localeBlock = {
     ar: `اكتب ${typeLabel} باللغة العربية مع بنية منظمة قابلة للطباعة والتعديل، وبدون زخرفة زائدة.`,
@@ -84,14 +81,8 @@ Adapt content to the given cycle and level.`
   try {
     const hfRes = await fetch(`https://api-inference.huggingface.co/models/${encodeURIComponent(model)}`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: { max_new_tokens: 600, temperature: 0.6, return_full_text: false }
-      })
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 600, temperature: 0.6, return_full_text: false } })
     });
 
     if (!hfRes.ok) {
@@ -101,14 +92,12 @@ Adapt content to the given cycle and level.`
 
     const data = await hfRes.json();
     let generated = "";
-
     if (Array.isArray(data) && data[0]?.generated_text) generated = data[0].generated_text;
     else if (data?.generated_text) generated = data.generated_text;
     else if (typeof data === "string") generated = data;
     else generated = JSON.stringify(data);
 
     generated = generated.replace(/\n{3,}/g, "\n\n").trim();
-
     return res.status(200).json({ content: generated, model });
   } catch (e) {
     console.error(e);
