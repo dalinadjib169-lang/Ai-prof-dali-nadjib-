@@ -1,5 +1,5 @@
 {
-  "name": "ai-teacher-assistant",
+  "name": "ai-prof-dali-nadjib",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,15 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "13.5.1",
+    "next": "13.5.6",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "file-saver": "^2.0.5",
-    "jspdf": "^2.5.1",
-    "html-to-docx": "^6.3.0"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "eslint": "8.44.0",
-    "eslint-config-next": "13.5.1"
+    "eslint": "^8.46.0"
   }
 }
