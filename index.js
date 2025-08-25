@@ -19,26 +19,15 @@ export default function Home() {
     setLoading(true);
     setResult("");
 
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
-      });
-
-      const data = await res.json();
-      if (res.ok) setResult(data.content);
-      else alert(data.error || "حدث خطأ");
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء الاتصال بالخادم");
-    }
-
-    setLoading(false);
+    // مجرد محاكاة للنتيجة بدون سيرفر
+    setTimeout(() => {
+      setResult(`تم إنشاء ${docType} للمادة ${subject} (${level}) باللغة ${lang}${topic ? `، الموضوع: ${topic}` : ""}`);
+      setLoading(false);
+    }, 1000);
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, backgroundColor: "#fff", color: "#000", minHeight: "100vh" }}>
       <h1>مولد المذكرات والاختبارات</h1>
 
       <div>
@@ -60,9 +49,9 @@ export default function Home() {
         <label>نوع المستند:</label>
         <select value={docType} onChange={(e) => setDocType(e.target.value)}>
           <option value="">اختر نوع المستند</option>
-          <option value="memo">مذكرة درس</option>
-          <option value="assessment">فرض</option>
-          <option value="exam">اختبار</option>
+          <option value="مذكرة درس">مذكرة درس</option>
+          <option value="فرض">فرض</option>
+          <option value="اختبار">اختبار</option>
         </select>
       </div>
 
