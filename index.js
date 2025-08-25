@@ -25,6 +25,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
       });
+
       const data = await res.json();
       if (res.ok) setResult(data.content);
       else alert(data.error || "حدث خطأ");
@@ -37,7 +38,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: "Arial, sans-serif" }}>
+    <div style={{ padding: 20 }}>
       <h1>مولد المذكرات والاختبارات</h1>
 
       <div>
