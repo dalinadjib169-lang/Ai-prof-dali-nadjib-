@@ -1,136 +1,94 @@
-import { useState, useRef } from "react";
-import { saveAs } from "file-saver";
-import htmlToDocx from "html-to-docx";
-import jsPDF from "jspdf";
-
-const UI = {
-  ar: {
-    title: "مساعد الأستاذ بالذكاء الاصطناعي",
-    cycle: "الطور",
-    subject: "المادة",
-    level: "المستوى/السنة",
-    docType: "النوع",
-    docTypes: { memo: "مذكرة", assessment: "فرض", exam: "اختبار" },
-    lang: "لغة الإخراج",
-    topic: "موضوع الدرس (اختياري)",
-    generate: "توليد",
-    regenerate: "إعادة توليد",
-    exportPDF: "تصدير PDF",
-    exportWord: "تصدير Word",
-    placeholder: "الناتج سيظهر هنا ويمكنك تعديله قبل التصدير...",
-    cycles: ["ابتدائي", "متوسط", "ثانوي"],
-    levels: ["1", "2", "3", "4", "5"],
-    langs: { ar: "العربية", fr: "الفرنسية", en: "الإنجليزية" }
-  },
-  fr: {
-    title: "Assistant Enseignant IA",
-    cycle: "Cycle",
-    subject: "Matière",
-    level: "Niveau/Année",
-    docType: "Type",
-    docTypes: { memo: "Fiche", assessment: "Devoir", exam: "Examen" },
-    lang: "Langue de sortie",
-    topic: "Thème (optionnel)",
-    generate: "Générer",
-    regenerate: "Régénérer",
-    exportPDF: "Exporter PDF",
-    exportWord: "Exporter Word",
-    placeholder: "La sortie apparaîtra ici et vous pouvez la modifier avant l’export…",
-    cycles: ["Primaire", "Collège", "Lycée"],
-    levels: ["1", "2", "3", "4", "5"],
-    langs: { ar: "Arabe", fr: "Français", en: "Anglais" }
-  },
-  en: {
-    title: "AI Teacher Assistant",
-    cycle: "Cycle",
-    subject: "Subject",
-    level: "Level/Grade",
-    docType: "Type",
-    docTypes: { memo: "Lesson Plan", assessment: "Quiz", exam: "Exam" },
-    lang: "Output Language",
-    topic: "Topic (optional)",
-    generate: "Generate",
-    regenerate: "Regenerate",
-    exportPDF: "Export PDF",
-    exportWord: "Export Word",
-    placeholder: "The output will appear here and you can edit before exporting…",
-    cycles: ["Primary", "Middle", "Secondary"],
-    levels: ["1", "2", "3", "4", "5"],
-    langs: { ar: "Arabic", fr: "French", en: "English" }
-  }
-};
+import { useState } from "react";
 
 export default function Home() {
-  const [uiLang, setUiLang] = useState("ar");
-  const T = UI[uiLang];
-
-  const [cycle, setCycle] = useState(T.cycles[1]);
+  const [cycle, setCycle] = useState("");
   const [subject, setSubject] = useState("");
-  const [level, setLevel] = useState(T.levels[2]);
-  const [docType, setDocType] = useState("memo");
-  const [lang, setLang] = useState(uiLang);
+  const [level, setLevel] = useState("");
+  const [docType, setDocType] = useState("");
+  const [lang, setLang] = useState("ar");
   const [topic, setTopic] = useState("");
-
-  const [content, setContent] = useState("");
+  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const outputRef = useRef(null);
 
-  const onGenerate = async () => {
-    if (!cycle || !subject || !level || !docType || !lang) return;
+  const handleGenerate = async () => {
+    if (!cycle || !subject || !level || !docType || !lang) {
+      alert("يرجى ملء جميع الحقول المطلوبة");
+      return;
+    }
+
     setLoading(true);
+    setResult("");
+
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
       });
+
       const data = await res.json();
-      setContent(data.content || data.error || "");
+      if (res.ok) setResult(data.content);
+      else alert(data.error || "حدث خطأ");
     } catch (err) {
-      setContent("Error generating content");
-    } finally {
-      setLoading(false);
+      console.error(err);
+      alert("حدث خطأ أثناء الاتصال بالخادم");
     }
-  };
 
-  const exportPDF = () => {
-    if (!outputRef.current) return;
-    const doc = new jsPDF();
-    doc.text(outputRef.current.innerText, 10, 10);
-    doc.save("lesson.pdf");
-  };
-
-  const exportWord = async () => {
-    if (!outputRef.current) return;
-    const blob = await htmlToDocx(outputRef.current, null, { table: { row: { cantSplit: true } } });
-    saveAs(blob, "lesson.docx");
+    setLoading(false);
   };
 
   return (
-    <div>
-      <h1>{T.title}</h1>
+    <div style={{ padding: 20 }}>
+      <h1>مولد المذكرات والاختبارات</h1>
+
       <div>
-        <select value={cycle} onChange={(e) => setCycle(e.target.value)}>
-          {T.cycles.map(c => <option key={c}>{c}</option>)}
-        </select>
-        <input placeholder={T.subject} value={subject} onChange={e => setSubject(e.target.value)} />
-        <select value={level} onChange={(e) => setLevel(e.target.value)}>
-          {T.levels.map(l => <option key={l}>{l}</option>)}
-        </select>
+        <label>الطور:</label>
+        <input value={cycle} onChange={(e) => setCycle(e.target.value)} />
+      </div>
+
+      <div>
+        <label>المادة:</label>
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} />
+      </div>
+
+      <div>
+        <label>المستوى/السنة:</label>
+        <input value={level} onChange={(e) => setLevel(e.target.value)} />
+      </div>
+
+      <div>
+        <label>نوع المستند:</label>
         <select value={docType} onChange={(e) => setDocType(e.target.value)}>
-          {Object.entries(T.docTypes).map(([k,v]) => <option key={k} value={k}>{v}</option>)}
+          <option value="">اختر نوع المستند</option>
+          <option value="memo">مذكرة درس</option>
+          <option value="assessment">فرض</option>
+          <option value="exam">اختبار</option>
         </select>
+      </div>
+
+      <div>
+        <label>اللغة:</label>
         <select value={lang} onChange={(e) => setLang(e.target.value)}>
-          {Object.entries(T.langs).map(([k,v]) => <option key={k} value={k}>{v}</option>)}
+          <option value="ar">عربي</option>
+          <option value="fr">فرنسي</option>
+          <option value="en">إنجليزي</option>
         </select>
-        <input placeholder={T.topic} value={topic} onChange={e => setTopic(e.target.value)} />
-        <button onClick={onGenerate}>{T.generate}</button>
-        <button onClick={exportPDF}>{T.exportPDF}</button>
-        <button onClick={exportWord}>{T.exportWord}</button>
       </div>
-      <div ref={outputRef} contentEditable style={{ border: "1px solid #ccc", padding: "10px", minHeight: "200px" }}>
-        {content || T.placeholder}
+
+      <div>
+        <label>الموضوع (اختياري):</label>
+        <input value={topic} onChange={(e) => setTopic(e.target.value)} />
       </div>
+
+      <button onClick={handleGenerate} disabled={loading}>
+        {loading ? "جاري الإنشاء..." : "إنشاء"}
+      </button>
+
+      {result && (
+        <div style={{ marginTop: 20, whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: 10 }}>
+          {result}
+        </div>
+      )}
     </div>
   );
 }
