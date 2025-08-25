@@ -38,27 +38,27 @@ export default function Home() {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "50px auto", padding: 20, fontFamily: "Arial" }}>
-      <h1 style={{ textAlign: "center" }}>مولد المذكرات والاختبارات</h1>
+    <div style={{ padding: 20, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+      <h1>مولد المذكرات والاختبارات</h1>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>الطور: </label>
-        <input value={cycle} onChange={(e) => setCycle(e.target.value)} style={{ width: "100%" }} />
+      <div>
+        <label>الطور:</label>
+        <input value={cycle} onChange={(e) => setCycle(e.target.value)} />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>المادة: </label>
-        <input value={subject} onChange={(e) => setSubject(e.target.value)} style={{ width: "100%" }} />
+      <div>
+        <label>المادة:</label>
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>المستوى/السنة: </label>
-        <input value={level} onChange={(e) => setLevel(e.target.value)} style={{ width: "100%" }} />
+      <div>
+        <label>المستوى/السنة:</label>
+        <input value={level} onChange={(e) => setLevel(e.target.value)} />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>نوع المستند: </label>
-        <select value={docType} onChange={(e) => setDocType(e.target.value)} style={{ width: "100%" }}>
+      <div>
+        <label>نوع المستند:</label>
+        <select value={docType} onChange={(e) => setDocType(e.target.value)}>
           <option value="">اختر نوع المستند</option>
           <option value="memo">مذكرة درس</option>
           <option value="assessment">فرض</option>
@@ -66,26 +66,26 @@ export default function Home() {
         </select>
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>اللغة: </label>
-        <select value={lang} onChange={(e) => setLang(e.target.value)} style={{ width: "100%" }}>
+      <div>
+        <label>اللغة:</label>
+        <select value={lang} onChange={(e) => setLang(e.target.value)}>
           <option value="ar">عربي</option>
           <option value="fr">فرنسي</option>
           <option value="en">إنجليزي</option>
         </select>
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label>الموضوع (اختياري): </label>
-        <input value={topic} onChange={(e) => setTopic(e.target.value)} style={{ width: "100%" }} />
+      <div>
+        <label>الموضوع (اختياري):</label>
+        <input value={topic} onChange={(e) => setTopic(e.target.value)} />
       </div>
 
-      <button onClick={handleGenerate} disabled={loading} style={{ width: "100%", padding: 10, fontSize: 16 }}>
+      <button onClick={handleGenerate} disabled={loading}>
         {loading ? "جاري الإنشاء..." : "إنشاء"}
       </button>
 
       {result && (
-        <div style={{ marginTop: 20, whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: 10, borderRadius: 5 }}>
+        <div style={{ marginTop: 20, whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: 10 }}>
           {result}
         </div>
       )}
