@@ -23,7 +23,7 @@ export default function Home() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cycle, subject, level, docType, lang, topic }),
+        body: JSON.stringify({ cycle, subject, level, docType, lang, topic })
       });
 
       const data = await res.json();
@@ -38,7 +38,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: 20, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+    <div style={{ padding: 20 }}>
       <h1>مولد المذكرات والاختبارات</h1>
 
       <div>
