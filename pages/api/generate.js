@@ -5,24 +5,29 @@ const client = new OpenAI({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST requests allowed" });
+  }
 
-  const { cycle, subject, level, docType, lang, topic } = req.body;
+  const { prompt } = req.body;
 
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        {
-          role: "user",
-          content: `أنت أستاذ. أنشئ ${docType} في مادة ${subject} للطور ${cycle} والمستوى ${level} باللغة ${lang}. الموضوع: ${topic || "عام"}`
-        }
-      ]
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
     });
 
-    res.status(200).json({ content: response.choices[0].message.content });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "فشل توليد المستند" });
+    res.status(200).json({
+      success: true,
+      result: completion.choices[0].message.content,
+      prompt: prompt,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 }
